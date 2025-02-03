@@ -4,9 +4,10 @@ import {
   SafeAreaView,
   View,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Entypo from "react-native-vector-icons/Entypo";
 import Feather from "react-native-vector-icons/Feather";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -14,15 +15,44 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import HeaderComp from "../components/HeaderComp";
 import { iconSize, spacing } from "../constants/dimensions";
 import { color } from "../constants/color";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import { removePhoneNumber, getPhoneNumber } from "../utils/storageService";
+import LoginModal from "../components/LoginModal";
 const UserScreen = () => {
   const navigation = useNavigation();
 
+  const route = useRoute();
+  const { phoneNumber } = route.params || {};
+
   const toEditProfile = () => {
     navigation.navigate("EditProfileScreen");
+  };
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const getPhnNum = await getPhoneNumber();
+      setIsLoggedIn(!!getPhnNum);
+    };
+    checkLoginStatus();
+  }, []);
+
+  const handleLogout = async () => {
+    if (isLoggedIn) {
+      await removePhoneNumber();
+      navigation.navigate("HomeScreen");
+    } else {
+      Alert.alert("Please Login", "You need to log in first to logout.");
+      // setIsModalVisible(true);
+    }
+  };
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
   };
 
   return (
@@ -36,7 +66,12 @@ const UserScreen = () => {
           </View>
 
           <TouchableOpacity style={styles.userView1} onPress={toEditProfile}>
-            <Text style={styles.txt1}>Saravana</Text>
+            {phoneNumber ? (
+              <Text style={styles.txt1}>{phoneNumber}</Text>
+            ) : (
+              <Text style={styles.txt1}>Saravana</Text>
+            )}
+
             <Entypo name={"chevron-right"} size={25} style={styles.arrow} />
           </TouchableOpacity>
         </View>
@@ -89,20 +124,21 @@ const UserScreen = () => {
 
         <View style={styles.listSection}>
           <Text style={styles.headTxt}>Others</Text>
-          <TouchableOpacity style={styles.list1}>
+          {/* <TouchableOpacity style={styles.list1}>
             <Feather name="box" size={25} color="#000" />
             <Text style={styles.list1Txt}>Community</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.list1}>
             <AntDesign name="star" size={25} color="#000" />
             <Text style={styles.list1Txt}>Rate Us</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.list1}>
+          <TouchableOpacity style={styles.list1} onPress={handleLogout}>
             <MaterialIcons name="logout" size={25} color="#000" />
             <Text style={styles.list1Txt}>Logout</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <LoginModal toggleModal={toggleModal} isModalVisible={isModalVisible} />
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
@@ -17,14 +17,17 @@ const DeleteConfirmation = () => {
     "You will not be able to check your saved addresses, payment methods, and wishlist",
     "You will lose out on the latest offers, discounts, and sale updates",
   ];
+
+  const gotToEditPage = () => {};
+
   return (
     <View style={styles.container}>
-      <View style={styles.tab}>
+      {/* <View style={styles.tab}>
         <TouchableWithoutFeedback onPress={backToEdit}>
           <Entypo name={"chevron-left"} size={25} style={styles.arrow} />
         </TouchableWithoutFeedback>
         <Text style={styles.txt}>DeleteConfirmation</Text>
-      </View>
+      </View> */}
       <View style={styles.container1}>
         <Text style={styles.txtHead}>Once you delete your account</Text>
         {guidelines.map((g, index) => (
@@ -32,6 +35,14 @@ const DeleteConfirmation = () => {
             {`\u2022 ${g}`}
           </Text>
         ))}
+      </View>
+      <View style={styles.btnContainer}>
+        <TouchableOpacity style={styles.btn1} onPress={backToEdit}>
+          <Text style={styles.btnTxt}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn2}>
+          <Text style={styles.btnTxt}>Delete</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -75,5 +86,33 @@ const styles = StyleSheet.create({
     lineSpacing: 3,
     fontWeight: "600",
     paddingVertical: 10,
+  },
+  btnContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 10,
+    textAlign: "center",
+    marginVertical: 30,
+  },
+  btn1: {
+    backgroundColor: "#0A3981",
+    width: 150,
+    borderRadius: 2,
+    textAlign: "center",
+    padding: 5,
+  },
+  btn2: {
+    backgroundColor: "#0A3981",
+    width: 180,
+    borderRadius: 2,
+    textAlign: "center",
+    padding: 5,
+  },
+  btnTxt: {
+    textAlign: "center",
+    color: "white",
+    fontWeight: "bold",
   },
 });

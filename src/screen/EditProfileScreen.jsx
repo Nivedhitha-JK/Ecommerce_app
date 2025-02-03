@@ -24,12 +24,12 @@ const EditProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tab}>
+      {/* <View style={styles.tab}>
         <TouchableOpacity onPress={backToUser}>
           <Entypo name={"chevron-left"} size={30} />
         </TouchableOpacity>
         <Text style={styles.txt}>EDIT PROFILE INFORAMTION</Text>
-      </View>
+      </View> */}
 
       <Tab.Navigator
         screenOptions={{

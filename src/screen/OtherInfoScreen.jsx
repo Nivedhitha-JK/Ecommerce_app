@@ -15,24 +15,24 @@ const OtherInfoScreen = () => {
 
   //api data
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          "https://jsonplaceholder.typicode.com/posts"
-        );
-        const data = await response.json();
-        console.log(data);
-        setProduct(data);
-      } catch (error) {
-        console.error("error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await fetch(
+  //         "https://jsonplaceholder.typicode.com/posts"
+  //       );
+  //       const data = await response.json();
+  //       console.log(data);
+  //       setProduct(data);
+  //     } catch (error) {
+  //       console.error("error");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   const renderProduct = ({ item }) => (
     <View>

@@ -83,3 +83,4 @@ To learn more about React Native, take a look at the following resources:
 
 1.post api, get products, 'http://192.168.20.5:3000/productList'
 2.get api, passing productid in queryparams, 'http://192.168.20.5:3000/getProductById?productId=66fb84287d9ad610ef70d3af'
+3.post api in productshow component, passing product id in body,http://192.168.20.5:3000/similarProductsByColor

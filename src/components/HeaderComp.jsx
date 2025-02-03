@@ -12,6 +12,10 @@ const HeaderComp = () => {
     navigation.navigate("CartScreen");
   };
 
+  const goToHome = () => {
+    navigation.navigate("Home");
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity>
@@ -19,12 +23,13 @@ const HeaderComp = () => {
           name={"chevron-back"}
           size={iconSize.md}
           color={color.iconPrimary}
+          onPress={goToHome}
         />
       </TouchableOpacity>
       <Text style={styles.txt}>ACCOUNT</Text>
       <View style={styles.container1}>
-        <TouchableOpacity>
-          <MaterialCommunityIcons name={"cart"} size={25} onPress={goToCart} />
+        <TouchableOpacity onPress={goToCart}>
+          <MaterialCommunityIcons name={"cart"} size={25} />
         </TouchableOpacity>
       </View>
     </View>

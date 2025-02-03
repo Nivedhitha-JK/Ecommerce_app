@@ -222,7 +222,7 @@ const PrimaryScreen = () => {
 
               {/* form start */}
               <FloatingLabelInput
-                label={"First Name *"}
+                label={"Full Name *"}
                 value={name}
                 onChangeText={setName}
                 containerStyles={styles.inputContainer}

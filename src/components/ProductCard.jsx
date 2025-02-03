@@ -5,7 +5,14 @@ import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import ProductShow from "./ProductShow";
 
-const ProductCard = ({ name, price, fullImgUrl, productId, onPress }) => {
+const ProductCard = ({
+  name,
+  price,
+  fullImgUrl,
+  productId,
+  onPress,
+  // onProductPress,
+}) => {
   const [isLike, setIsLike] = useState(false);
   const handleLike = () => {
     setIsLike(!isLike);
@@ -18,6 +25,7 @@ const ProductCard = ({ name, price, fullImgUrl, productId, onPress }) => {
   // };
 
   console.log("product Id", productId);
+  console.log(fullImgUrl);
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPress}>
@@ -27,6 +35,7 @@ const ProductCard = ({ name, price, fullImgUrl, productId, onPress }) => {
           style={styles.proImg}
         />
       </TouchableOpacity>
+
       <Text style={styles.proTxt}>{name}</Text>
       <Text style={styles.proTxt1}>
         {price ? `$${price}` : "price not available"}
@@ -57,18 +66,18 @@ export default ProductCard;
 const styles = StyleSheet.create({
   proImg: {
     height: 250,
-    width: "100%",
+    width: "90%",
     borderRadius: 25,
-    marginLeft: 10,
-    marginVertical: 10,
+    marginHorizontal: 10,
   },
   container: {
     flex: 1,
+    // flexDirection: "column",
     justifyContent: "center",
     alignContent: "center",
     position: "relative",
-    // backgroundColor: "blue",
-    width: 150,
+    // backgroundColor: "lightgreen",
+    width: 200,
   },
   proTxt: {
     fontSize: 14,
@@ -91,6 +100,6 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     position: "absolute",
     top: 20,
-    right: 5,
+    right: 18,
   },
 });

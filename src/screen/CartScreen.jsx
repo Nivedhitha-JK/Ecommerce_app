@@ -1,23 +1,121 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React from "react";
-
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React, { useLayoutEffect, useState } from "react";
+import { useCart } from "../context/CartContext";
+import { FlatList } from "react-native-gesture-handler";
+import CartCardScreen from "./CartCardScreen";
 import { useNavigation } from "@react-navigation/native";
-// import UserScreen from "./UserScreen";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import StepIndicator from "react-native-step-indicator";
 
 const CartScreen = () => {
+  const [currentPosition, setCurrentPosition] = useState(1);
+
+  const labels = ["Cart", "Address", "Payment", "summary"];
+
+  const customStyles = {
+    stepIndicatorSize: 25,
+    currentStepIndicatorSize: 30,
+    separatorStrokeWidth: 2,
+    currentStepStrokeWidth: 3,
+    stepStrokeCurrentColor: "#0A3981",
+    stepStrokeWidth: 3,
+    stepStrokeFinishedColor: "#0A3981",
+    stepStrokeUnFinishedColor: "#aaaaaa",
+    separatorFinishedColor: "#0A3981",
+    separatorUnFinishedColor: "#aaaaaa",
+    stepIndicatorFinishedColor: "#0A3981",
+    stepIndicatorUnFinishedColor: "#ffffff",
+    stepIndicatorCurrentColor: "#ffffff",
+    stepIndicatorLabelFontSize: 13,
+    currentStepIndicatorLabelFontSize: 13,
+    stepIndicatorLabelCurrentColor: "#0A3981",
+    stepIndicatorLabelFinishedColor: "#ffffff",
+    stepIndicatorLabelUnFinishedColor: "#aaaaaa",
+    labelColor: "#999999",
+    labelSize: 13,
+    currentStepLabelColor: "#0A3981",
+  };
+
+  const { cartItems, removeFromCart, clearCart, updateCartItem } = useCart();
+  console.log(cartItems);
+
   const navigation = useNavigation();
-  // const goToUser = () => {
-  //   navigation.navigate("UserScreen");
-  // };
+
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerLeft: () => (
+  //       <TouchableOpacity onPress={() => navigation.popToTop()}>
+  //         <Ionicons name="chevron-back" size={25} style={styles.arrow} />
+  //       </TouchableOpacity>
+  //     ),
+  //   });
+  // }, [navigation]);
+
+  const TotalPrice = cartItems.reduce(
+    (total, item) => total + item.finalprice * (item.quantity || 1),
+    0
+  );
+
   return (
     <View style={styles.container}>
-      {/* <HeaderComp /> */}
+      {/* <Text style={styles.txt}>Your cart</Text> */}
+      <StepIndicator
+        customStyles={customStyles}
+        currentPosition={currentPosition}
+        labels={labels}
+      />
 
-      <TouchableOpacity>
-        <Ionicons name={"chevron-back"} size={25} onPress={goToUser} />
-      </TouchableOpacity>
-      <Text style={styles.txt}>CART</Text>
+      {cartItems.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Image
+            source={require("../assets/images/emptyCartImage.png")}
+            style={styles.emptyCart}
+          />
+          <Text style={styles.emptyTxt}>
+            Your cart is Empty...
+            <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")}>
+              <Text style={styles.emptyTxt1}>Grab something</Text>
+            </TouchableOpacity>
+            🚀
+          </Text>
+        </View>
+      ) : (
+        <>
+          {/* <StepIndicator
+            customStyles={customStyles}
+            currentPosition={currentPosition}
+            labels={labels}
+          /> */}
+
+          <FlatList
+            data={cartItems}
+            keyExtractor={(item, index) => `${item.id} - ${index}`}
+            renderItem={({ item }) => (
+              <CartCardScreen item={item} onUpdateCartItem={updateCartItem} />
+            )}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              <View style={styles.orderDetailContainer}>
+                <Text style={styles.txt}>Order Details</Text>
+                <View style={styles.horizontalLine} />
+                <View style={styles.priceContainer}>
+                  <Text style={styles.txt1}>Total MRP</Text>
+                  <Text style={styles.txt1}>${TotalPrice.toFixed(2)}</Text>
+                </View>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.txt1}>Shipping fee</Text>
+                  <Text style={styles.freeTxt}>Free</Text>
+                </View>
+                <View style={styles.horizontalLine} />
+                <View style={styles.priceContainer}>
+                  <Text style={styles.totalTxt}>Total Amount</Text>
+                  <Text style={styles.totalTxt}>${TotalPrice.toFixed(2)}</Text>
+                </View>
+              </View>
+            }
+          />
+        </>
+      )}
     </View>
   );
 };
@@ -27,17 +125,62 @@ export default CartScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row",
-    margin: 10,
-    // alignItems: "center",
-    justifyContent: "space-betweesn",
-    alignContent: "center",
-    gap: 5,
+    marginVertical: 15,
   },
   txt: {
-    letterSpacing: 1,
+    fontSize: 20,
     fontWeight: "bold",
-    fontFamily: "Helvetica",
-    marginTop: 5,
+    marginHorizontal: 10,
+    marginVertical: 10,
+    color: "#0A3981",
+  },
+  emptyTxt: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 10,
+    // backgroundColor: "red",
+  },
+  emptyTxt1: {
+    fontSize: 20,
+    fontWeight: "bold",
+    // backgroundColor: "green",
+    marginBottom: -4,
+    color: "#0A3981",
+  },
+  emptyCart: {
+    width: 200,
+    height: 200,
+    color: "#0A3981",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  priceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginVertical: 10,
+  },
+  txt1: {
+    fontSize: 15,
+    // fontWeight: "bold",
+  },
+  freeTxt: {
+    color: "green",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  horizontalLine: {
+    height: 1,
+    backgroundColor: "gray",
+    marginHorizontal: 10,
+  },
+  totalTxt: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "#0A3981",
   },
 });
