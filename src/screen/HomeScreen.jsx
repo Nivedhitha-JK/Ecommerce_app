@@ -43,8 +43,8 @@ const HomeScreen = () => {
 
       checkLoginStatus();
 
-      return () => {}; // Return a cleanup function or undefined
-    }, []) // Dependencies should be an empty array to run once when focused
+      // return () => {};
+    }, [isLoggedIn])
   );
 
   // fetch data from api
@@ -244,7 +244,6 @@ const HomeScreen = () => {
     </View>
   );
 };
-
 export default HomeScreen;
 
 const styles = StyleSheet.create({

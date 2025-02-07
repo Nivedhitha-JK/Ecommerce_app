@@ -9,7 +9,7 @@ import {
 import Fontisto from "react-native-vector-icons/Fontisto";
 import Octicons from "react-native-vector-icons/Octicons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-
+import Ionicons from "react-native-vector-icons/Ionicons";
 const TopSearchScreen = ({ isLoggedIn, phoneNumber }) => {
   console.log(isLoggedIn);
   console.log(phoneNumber);
@@ -19,9 +19,13 @@ const TopSearchScreen = ({ isLoggedIn, phoneNumber }) => {
         <TouchableOpacity>
           <FontAwesome name="user-circle-o" size={40} color={"#0A3981"} />
         </TouchableOpacity>
-        <Text style={styles.txt}>{isLoggedIn ? "Login" : "Guest"}</Text>
+        <Text style={styles.txt}>{isLoggedIn ? phoneNumber : "Guest"}</Text>
       </View>
-      <View style={styles.inputContainer}>
+      <View style={styles.rightContainer}>
+        <Ionicons name={"search"} size={25} style={styles.searchIcon} />
+        <Ionicons name={"notifications"} size={25} style={styles.bellIcon} />
+      </View>
+      {/* <View style={styles.inputContainer}>
         <View style={styles.iconWrapper}>
           <Fontisto name={"search"} size={25} style={styles.icon} />
         </View>
@@ -33,11 +37,10 @@ const TopSearchScreen = ({ isLoggedIn, phoneNumber }) => {
         <View style={styles.iconWrapper}>
           <Octicons name={"filter"} size={25} style={styles.icon1} />
         </View>
-      </View>
+      </View> */}
     </View>
   );
 };
-
 export default TopSearchScreen;
 
 const styles = StyleSheet.create({
@@ -99,5 +102,17 @@ const styles = StyleSheet.create({
   txt: {
     fontFamily: "Nunito-ExtraBold",
     color: "#0A3981",
+  },
+  searchIcon: {
+    color: "#0A3981",
+  },
+  bellIcon: {
+    color: "#0A3981",
+    fontWeight: "bold",
+  },
+  rightContainer: {
+    flexDirection: "row",
+    gap: 15,
+    // backgroundColor: "green",
   },
 });

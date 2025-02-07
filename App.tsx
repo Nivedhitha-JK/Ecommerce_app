@@ -26,7 +26,9 @@ import Feather from "react-native-vector-icons/Feather";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { ParamListBase } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
-
+import PaymentScreen from "./src/screen/PaymentScreen";
+import AddressScreen from "./src/screen/AddressScreen";
+import AddAddressScreen from "./src/screen/AddAddressScreen";
 const Tab = createBottomTabNavigator();
 
 const Stack = createStackNavigator();
@@ -43,6 +45,8 @@ const getTabBarVisibility = (route) => {
     "DeleteConfirmation",
     "SettingsScreen",
     "EditProfileScreen",
+    "PaymentScreen",
+    "AddAddressScreen",
   ];
 
   return hiddenScreens.includes(routeName)
@@ -145,7 +149,22 @@ const HomeStack = () => {
       <Stack.Screen
         name="OrderScreen"
         component={OrderScreen}
-        options={{ headerTitle: "Order Summary" }}
+        options={{ headerTitle: "REVIEW YOUR ORDER" }}
+      />
+      <Stack.Screen
+        name="PaymentScreen"
+        component={PaymentScreen}
+        options={{ headerTitle: "PAYMENT METHOD" }}
+      />
+      <Stack.Screen
+        name="AddressScreen"
+        component={AddressScreen}
+        options={{ headerTitle: "DELIVERY ADDRESS" }}
+      />
+      <Stack.Screen
+        name="AddAddressScreen"
+        component={AddAddressScreen}
+        options={{ headerTitle: "ADD DELIVERY ADDRESS" }}
       />
     </Stack.Navigator>
   );

@@ -120,6 +120,10 @@ const UserScreen = () => {
             <Icon name="favorite" size={25} color="#000" />
             <Text style={styles.list1Txt}>Wishlisted Products</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.list1}>
+            <Entypo name="address" size={25} color="#000" />
+            <Text style={styles.list1Txt}>Your Address</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.listSection}>

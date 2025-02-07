@@ -1,6 +1,7 @@
 import React from "react";
 import { FlatList, StyleSheet, Text, View, Image } from "react-native";
 import ProductCard from "../components/ProductCard";
+import LoaderKit from "react-native-loader-kit";
 
 const ProductListing = ({ product, loading, onProductPress }) => {
   const renderProduct = ({ item }) => {
@@ -37,7 +38,14 @@ const ProductListing = ({ product, loading, onProductPress }) => {
       style={styles.productContainer}
       ListEmptyComponent={
         loading ? (
-          <Text style={{ textAlign: "center", marginTop: 30 }}>Loading...</Text>
+          // <Text style={{ textAlign: "center", marginTop: 30 }}>Loading...</Text>
+          <View style={styles.loader}>
+            <LoaderKit
+              style={{ width: 50, height: 50 }}
+              name={"Pacman"}
+              color={"#0A3981"}
+            />
+          </View>
         ) : (
           <View style={styles.imgContainer}>
             <Image
@@ -79,5 +87,10 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: "Nunito-Bold",
     color: "#0A3981",
+  },
+  loader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

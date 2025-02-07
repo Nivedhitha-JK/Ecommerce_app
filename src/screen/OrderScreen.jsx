@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TouchableOpacity,
-  TouchableHighlight,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import LoaderKit from "react-native-loader-kit";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import CustomStepIndicator from "../components/CustomStepIndicator";
 const OrderScreen = ({ route }) => {
   const { productDetails, selectedColor, selectedQuantity, selectedSize } =
     route.params;
@@ -18,8 +22,31 @@ const OrderScreen = ({ route }) => {
   console.log(baseUrl);
   const imageUrl = `${baseUrl}${productDetails.images[0]}`;
   console.log(imageUrl);
+  const [currentPosition, setCurrentPosition] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const labels = ["Review", "Payment"];
+
+  const navigation = useNavigation();
+
+  const handlePayment = () => {
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+      navigation.navigate("PaymentScreen");
+    }, 2000);
+  };
+
   return (
     <View style={styles.container}>
+      <View style={styles.stepContainer}>
+        <CustomStepIndicator
+          currentPosition={currentPosition}
+          labels={labels}
+        />
+      </View>
       <View style={styles.addressContainer}>
         <View style={styles.address1}>
           <Text style={styles.addressTxt}>Deliver to:</Text>
@@ -52,15 +79,66 @@ const OrderScreen = ({ route }) => {
           <Text style={styles.proTxt1}>Size: {selectedSize}</Text>
         </View>
       </View>
-      <View style={styles.msgContainer}>
+      {/* <View style={styles.msgContainer}>
         <Text>Price Details</Text>
         <Text>₹ {productDetails.final_price}</Text>
+      </View> */}
+
+      <View style={styles.priceDetailsContainer}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setIsExpanded(!isExpanded);
+          }}
+        >
+          <View style={styles.priceDetailsHeader}>
+            <Text style={styles.priceDetailsTitle}>Price Details</Text>
+            <MaterialIcons
+              size={23}
+              color="#0A3981"
+              name={isExpanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+            />
+          </View>
+        </TouchableWithoutFeedback>
+        {isExpanded && (
+          <View style={styles.priceBreakdown}>
+            <View style={styles.priceItem}>
+              <Text style={styles.priceLabel}>Total Price</Text>
+              <Text style={styles.priceValue}>
+                ₹{productDetails.final_price}
+              </Text>
+            </View>
+            <View style={styles.priceItem}>
+              <Text style={styles.priceLabel}>Shipping Fee</Text>
+              <Text style={styles.priceValue}>₹0</Text>
+            </View>
+            <View style={styles.priceItemTotal}>
+              <Text style={styles.priceLabelTotal}>Total</Text>
+              <Text style={styles.priceValueTotal}>
+                ₹{productDetails.final_price}
+              </Text>
+            </View>
+          </View>
+        )}
       </View>
       <View>
-        <TouchableHighlight>
+        <TouchableOpacity onPress={handlePayment}>
           <Text style={styles.btn}>Continue</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
+
+      <Modal transparent={true} visible={loading} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {/* <ActivityIndicator size="large" color="red" /> */}
+            <LoaderKit
+              style={{ width: 50, height: 50 }}
+              name={"Pacman"}
+              color={"#0A3981"}
+            />
+            <Text style={styles.loadingTxt}>Please Wait...</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -72,7 +150,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "lightgray",
     flexDirection: "column",
-    gap: 10,
+    gap: 5,
   },
   image: {
     width: 150,
@@ -148,5 +226,79 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 3,
     fontFamily: "MierA-DemiBold",
+    marginVertical: 20,
+  },
+  stepContainer: {
+    backgroundColor: "white",
+    // marginVertical: 5,
+    paddingVertical: 7,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 50,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  loadingTxt: {
+    fontSize: 15,
+    marginTop: 10,
+  },
+  priceDetailsContainer: {
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    marginVertical: 7,
+  },
+  priceDetailsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+  },
+  priceDetailsTitle: {
+    fontSize: 18,
+    fontFamily: "Nunito-Bold",
+    color: "#000",
+  },
+  priceBreakdown: {
+    borderTopWidth: 1,
+    borderTopColor: "#e2e2e2",
+    paddingVertical: 10,
+  },
+  priceItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 5,
+  },
+  priceLabel: {
+    fontSize: 16,
+    color: "#555",
+  },
+  priceValue: {
+    fontSize: 16,
+    color: "#000",
+  },
+  priceItemTotal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e2e2",
+    marginTop: 10,
+  },
+  priceLabelTotal: {
+    fontSize: 17,
+    fontFamily: "Nunito-Bold",
+    color: "#000",
+  },
+  priceValueTotal: {
+    fontSize: 17,
+    fontFamily: "Nunito-Bold",
+    color: "#000",
   },
 });

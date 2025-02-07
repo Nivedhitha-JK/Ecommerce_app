@@ -5,8 +5,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Modal,
-  TextInput,
   Alert,
 } from "react-native";
 
@@ -16,16 +14,16 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 import API_BASE_URL from "../config/api";
 import { useCart } from "../context/CartContext";
-// import LoginModal from "../screen/LoginModal";
 import LoginModal from "../components/LoginModal";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import { savePhoneNumber, getPhoneNumber } from "../utils/storageService";
 import Toast from "react-native-toast-message";
+
 const ProductShow = () => {
   const { addToCart } = useCart();
 
   const route = useRoute();
   const { productId } = route.params;
-  console.log(productId);
+  // console.log(productId);
 
   const [productDetails, setProductDetails] = useState(null);
   const [availableColors, setAvailableColors] = useState(null);
@@ -57,7 +55,7 @@ const ProductShow = () => {
 
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false); // Flag to track if OTP is sent
-
+  const [tempProduct, setTempProduct] = useState(null);
   // const fetchColorByProduct = async (color) => {
   //   setLoading(true);
   //   try {
@@ -73,54 +71,44 @@ const ProductShow = () => {
   // };
 
   const navigation = useNavigation();
-  const gotoCartPage = () => {
-    if (isLoggedIn) {
-      console.log(setPhoneNumber);
-      navigation.navigate(
-        "CartScreen"
 
-        //  {
-        //   product_details: productDetails,
-        //   selected_quantity: selectedQuantity,
-        //   selected_color: selectedColor,
-        //   selected_size: selectedSize,
-        // }
-      );
-    } else {
-      setIsModalVisible(true);
-    }
-  };
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const storedPhoneNum = await getPhoneNumber();
+      if (storedPhoneNum) {
+        setIsLoggedIn(true);
+        setPhoneNumber(storedPhoneNum);
+      } else {
+        setIsLoggedIn(false);
+        setPhoneNumber("");
+      }
+    };
+    checkLoginStatus();
+  }, []);
 
   //monitor login state for navigation
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigation.navigate("CartScreen");
-    }
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigation.navigate("CartScreen");
+  //   }
+  // }, [isLoggedIn]);
 
   // submit login
-  const loginSubmit = () => {
+  const loginSubmit = async () => {
     if (phoneNumber.length === 10) {
       console.log(phoneNumber);
-      setIsOtpSent(true);
-      navigation.navigate("EnterOtpScreen", { phoneNumber });
-      // toggleModal();
-      // setIsLoggedIn(true);
-      // gotoCartPage();
+      await savePhoneNumber(phoneNumber);
+      // setIsOtpSent(true);
+      setIsLoggedIn(true);
+      navigation.navigate("EnterOtpScreen", { phoneNumber, tempProduct });
+      setIsModalVisible(false);
     } else {
       Alert.alert(
         "Invalid Phone Number",
         "Please enter a valid 10-digit phone number."
       );
     }
-  };
-
-  // allow numerics only
-
-  const handleInputChange = (txt) => {
-    const numericVal = txt.replace(/[^0-9]/g, "");
-    setPhoneNumber(numericVal);
   };
 
   //modal function
@@ -133,6 +121,21 @@ const ProductShow = () => {
 
   const AddToCart = () => {
     if (selectedSize && selectedColor && selectedQuantity) {
+      const item = {
+        id: productDetails._id,
+        name: productDetails.name,
+        finalprice: productDetails.final_price,
+        mrp: productDetails.MRP,
+        price_with_gst: productDetails.price_with_gst,
+        gst_percentage: productDetails.gst_percentage,
+        offer_percentage: productDetails.offer_percentage,
+        image: `${API_BASE_URL}${productDetails.images[0]}`,
+        size: selectedSize,
+        available_size: sizes,
+        color: selectedColor,
+        quantity: selectedQuantity,
+      };
+
       if (isLoggedIn) {
         console.log(
           "selected size:",
@@ -142,35 +145,22 @@ const ProductShow = () => {
           "selected quantity product:",
           selectedQuantity
         );
-        const item = {
-          id: productDetails._id,
-          name: productDetails.name,
-          finalprice: productDetails.final_price,
-          mrp: productDetails.MRP,
-          price_with_gst: productDetails.price_with_gst,
-          gst_percentage: productDetails.gst_percentage,
-          offer_percentage: productDetails.offer_percentage,
-          image: `${API_BASE_URL}${productDetails.images[0]}`,
-          size: selectedSize,
-          available_size: sizes,
-          color: selectedColor,
-          quantity: selectedQuantity,
-        };
 
         addToCart(item);
         console.log("added item", item);
-        navigation.navigate("CartScreen");
-        // Toast.show({
-        //   type: "success",
-        //   text1: "product added to cart",
-        // });
-        // navigation.navigate("ProductShow");
-        // gotoCartPage();
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "Item Added to Cart",
+          text2: `${productDetails.name} has been added to your cart.`,
+        });
+        setIsModalVisible(false);
       } else {
+        setTempProduct(item);
         setIsModalVisible(true);
       }
     } else {
-      Alert.alert("Please select size, color and qunatity");
+      Alert.alert("Please select size, color and quantity");
     }
   };
 
@@ -221,6 +211,11 @@ const ProductShow = () => {
     return (
       <View>
         <Text>Loading...</Text>
+        {/* <LoaderKit
+          style={{ width: 50, height: 50 }}
+          name={"BallPulseSync"} // Optional: see list of animations below
+          color={"red"} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
+        /> */}
       </View>
     );
   }
@@ -248,12 +243,17 @@ const ProductShow = () => {
   // go to order page
 
   const goToOrderPage = () => {
-    navigation.navigate("OrderScreen", {
-      productDetails,
-      selectedColor,
-      selectedQuantity,
-      selectedSize,
-    });
+    if (isLoggedIn) {
+      navigation.navigate("OrderScreen", {
+        productDetails,
+        selectedColor,
+        selectedQuantity,
+        selectedSize,
+      });
+    } else {
+      //show toast to add product to cart
+      setIsModalVisible(true);
+    }
   };
 
   return (
@@ -415,39 +415,10 @@ const ProductShow = () => {
         // setIsLoggedIn={setIsLoggedIn}
       />
 
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>SignUp to Continue</Text>
-            <TextInput
-              style={styles.phoneNumber}
-              placeholder="Enter Your phone number"
-              keyboardType="phone-pad"
-              placeholderTextColor={"#0A3981"}
-              onChangeText={handleInputChange}
-              maxLength={10}
-              value={phoneNumber}
-            />
-            <View style={styles.btnContainer}>
-              <TouchableOpacity style={styles.loginBtn} onPress={loginSubmit}>
-                <Text style={styles.txt}>Send OTP</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={toggleModal}>
-                <Text style={styles.txt}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal> */}
+      <Toast />
     </View>
   );
 };
-
 export default ProductShow;
 
 const styles = StyleSheet.create({

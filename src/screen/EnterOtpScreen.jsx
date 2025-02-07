@@ -16,9 +16,10 @@ import { savePhoneNumber } from "../utils/storageService";
 
 const EnterOtpScreen = () => {
   const route = useRoute();
-  const { phoneNumber } = route.params;
+  const { phoneNumber, tempProduct } = route.params;
   console.log("Route Params", route.params);
   console.log(phoneNumber);
+  console.log(tempProduct);
 
   const [otp, setOtp] = useState("");
   const [isOtpValid, setIsOtpValid] = useState("");

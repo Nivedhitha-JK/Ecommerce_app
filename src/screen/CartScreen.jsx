@@ -1,40 +1,47 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { FlatList } from "react-native-gesture-handler";
 import CartCardScreen from "./CartCardScreen";
 import { useNavigation } from "@react-navigation/native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import StepIndicator from "react-native-step-indicator";
-
+import CustomStepIndicator from "../components/CustomStepIndicator";
+import LoaderKit from "react-native-loader-kit";
 const CartScreen = () => {
-  const [currentPosition, setCurrentPosition] = useState(1);
+  const [currentPosition, setCurrentPosition] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const labels = ["Cart", "Address", "Payment", "summary"];
 
-  const customStyles = {
-    stepIndicatorSize: 25,
-    currentStepIndicatorSize: 30,
-    separatorStrokeWidth: 2,
-    currentStepStrokeWidth: 3,
-    stepStrokeCurrentColor: "#0A3981",
-    stepStrokeWidth: 3,
-    stepStrokeFinishedColor: "#0A3981",
-    stepStrokeUnFinishedColor: "#aaaaaa",
-    separatorFinishedColor: "#0A3981",
-    separatorUnFinishedColor: "#aaaaaa",
-    stepIndicatorFinishedColor: "#0A3981",
-    stepIndicatorUnFinishedColor: "#ffffff",
-    stepIndicatorCurrentColor: "#ffffff",
-    stepIndicatorLabelFontSize: 13,
-    currentStepIndicatorLabelFontSize: 13,
-    stepIndicatorLabelCurrentColor: "#0A3981",
-    stepIndicatorLabelFinishedColor: "#ffffff",
-    stepIndicatorLabelUnFinishedColor: "#aaaaaa",
-    labelColor: "#999999",
-    labelSize: 13,
-    currentStepLabelColor: "#0A3981",
-  };
+  // const customStyles = {
+  //   stepIndicatorSize: 25,
+  //   currentStepIndicatorSize: 30,
+  //   separatorStrokeWidth: 2,
+  //   currentStepStrokeWidth: 3,
+  //   stepStrokeCurrentColor: "#0A3981",
+  //   stepStrokeWidth: 3,
+  //   stepStrokeFinishedColor: "#0A3981",
+  //   stepStrokeUnFinishedColor: "#aaaaaa",
+  //   separatorFinishedColor: "#0A3981",
+  //   separatorUnFinishedColor: "#aaaaaa",
+  //   stepIndicatorFinishedColor: "#0A3981",
+  //   stepIndicatorUnFinishedColor: "#ffffff",
+  //   stepIndicatorCurrentColor: "#ffffff",
+  //   stepIndicatorLabelFontSize: 13,
+  //   currentStepIndicatorLabelFontSize: 13,
+  //   stepIndicatorLabelCurrentColor: "#0A3981",
+  //   stepIndicatorLabelFinishedColor: "#ffffff",
+  //   stepIndicatorLabelUnFinishedColor: "#aaaaaa",
+  //   labelColor: "#999999",
+  //   labelSize: 13,
+  //   currentStepLabelColor: "#0A3981",
+  // };
 
   const { cartItems, removeFromCart, clearCart, updateCartItem } = useCart();
   console.log(cartItems);
@@ -56,15 +63,16 @@ const CartScreen = () => {
     0
   );
 
+  const goToAddress = () => {
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      navigation.navigate("AddressScreen");
+    }, 2000);
+  };
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.txt}>Your cart</Text> */}
-      <StepIndicator
-        customStyles={customStyles}
-        currentPosition={currentPosition}
-        labels={labels}
-      />
-
       {cartItems.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Image
@@ -81,11 +89,10 @@ const CartScreen = () => {
         </View>
       ) : (
         <>
-          {/* <StepIndicator
-            customStyles={customStyles}
+          <CustomStepIndicator
             currentPosition={currentPosition}
             labels={labels}
-          /> */}
+          />
 
           <FlatList
             data={cartItems}
@@ -111,6 +118,21 @@ const CartScreen = () => {
                   <Text style={styles.totalTxt}>Total Amount</Text>
                   <Text style={styles.totalTxt}>${TotalPrice.toFixed(2)}</Text>
                 </View>
+                <TouchableOpacity>
+                  {isLoading ? (
+                    <View style={styles.loader}>
+                      <LoaderKit
+                        style={{ width: 50, height: 50 }}
+                        name={"BallPulse"} // Optional: see list of animations below
+                        color={"#0A3981"}
+                      />
+                    </View>
+                  ) : (
+                    <Text style={styles.btn} onPress={goToAddress}>
+                      Continue
+                    </Text>
+                  )}
+                </TouchableOpacity>
               </View>
             }
           />
@@ -182,5 +204,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     color: "#0A3981",
+  },
+  btn: {
+    backgroundColor: "#0A3981",
+    padding: 5,
+    color: "white",
+    textAlign: "center",
+    marginHorizontal: 30,
+    borderRadius: 3,
+    fontFamily: "MierA-DemiBold",
+    marginVertical: 20,
+  },
+  loader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
