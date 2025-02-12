@@ -21,9 +21,9 @@ const CarouselScreen = ({ carouselData, goToCart }) => {
       renderItem={({ item }) => (
         <LinearGradient colors={["#D4EBF8", "#1F509A"]} style={styles.card}>
           <Image source={item.image} style={styles.img1} />
-          <TouchableOpacity style={styles.cartContainer} onPress={goToCart}>
+          {/* <TouchableOpacity style={styles.cartContainer} onPress={goToCart}>
             <MaterialCommunityIcons name={"cart"} size={23} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={styles.txtContainer}>
             <Text style={styles.bannerTxt}>{item.title}</Text>

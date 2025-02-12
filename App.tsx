@@ -46,6 +46,7 @@ const getTabBarVisibility = (route) => {
     "SettingsScreen",
     "EditProfileScreen",
     "PaymentScreen",
+    "AddressScreen",
     "AddAddressScreen",
   ];
 
@@ -101,11 +102,11 @@ const UserStack = () => {
         //   ),
         // }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="ProductShow"
         component={ProductShow}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="HomeScreen"
         component={HomeScreen}

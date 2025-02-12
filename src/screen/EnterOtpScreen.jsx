@@ -13,10 +13,12 @@ import OTPInputView from "@twotalltotems/react-native-otp-input";
 import { OtpInput } from "react-native-otp-entry";
 import Toast from "react-native-toast-message";
 import { savePhoneNumber } from "../utils/storageService";
+import ProductShow from "../components/ProductShow";
+import { CommonActions } from "@react-navigation/native";
 
 const EnterOtpScreen = () => {
   const route = useRoute();
-  const { phoneNumber, tempProduct } = route.params;
+  const { phoneNumber, tempProduct, productId } = route.params;
   console.log("Route Params", route.params);
   console.log(phoneNumber);
   console.log(tempProduct);
@@ -71,9 +73,30 @@ const EnterOtpScreen = () => {
               autoHide: true,
             });
 
-            setTimeout(() => {
-              navigation.navigate("HomeScreen", { showToast: true });
-            }, 2000);
+            // setTimeout(() => {
+            //   navigation.navigate("ProductShow", {
+            //     addedProduct: tempProduct,
+            //     showToast: true,
+            //     productId,
+            //   });
+            // }, 2000);
+
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 1,
+                routes: [
+                  { name: "HomeScreen" },
+                  {
+                    name: "ProductShow",
+                    params: {
+                      addedProduct: tempProduct,
+                      showToast: true,
+                      productId,
+                    },
+                  }, 
+                ],
+              })
+            );
           },
         },
       ]);

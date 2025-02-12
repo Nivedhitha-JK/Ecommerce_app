@@ -4,9 +4,6 @@ import {
   StyleSheet,
   Modal,
   TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
@@ -49,7 +46,7 @@ const AddAddressScreen = () => {
             style={styles.input}
             value={name}
             onChangeText={setName}
-            editable={true}
+            // editable={true}
           />
           {nameError ? <Text style={{ color: "red" }}>{nameError}</Text> : null}
         </View>

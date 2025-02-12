@@ -2,16 +2,18 @@ import React from "react";
 import { FlatList, StyleSheet, Text, View, Image } from "react-native";
 import ProductCard from "../components/ProductCard";
 import LoaderKit from "react-native-loader-kit";
+import API_BASE_URL from "../config/api";
 
 const ProductListing = ({ product, loading, onProductPress }) => {
   const renderProduct = ({ item }) => {
     // const defaultImage = require("../assets/images/pro_1.jpeg");
     // const image = item.images && item.images.length > 0 ? item.images[0] : null;
 
-    const apiUrl = "http://192.168.20.5:3000/";
+    // const apiUrl = "http://192.168.20.5:3000/";
+    const apiUrl = "http://192.168.20.22:3000/";
     const imgProductUrl = item.images[0];
 
-    const fullImgUrl = `${apiUrl}${imgProductUrl}`;
+    const fullImgUrl = `${API_BASE_URL}${imgProductUrl}`;
     console.log("Product ID:", item._id);
 
     // console.log(fullImgUrl);
@@ -38,13 +40,13 @@ const ProductListing = ({ product, loading, onProductPress }) => {
       style={styles.productContainer}
       ListEmptyComponent={
         loading ? (
-          // <Text style={{ textAlign: "center", marginTop: 30 }}>Loading...</Text>
           <View style={styles.loader}>
             <LoaderKit
-              style={{ width: 50, height: 50 }}
+              style={{ width: 70, height: 70 }}
               name={"Pacman"}
               color={"#0A3981"}
             />
+            <Text style={styles.loadTxt}>Loading...</Text>
           </View>
         ) : (
           <View style={styles.imgContainer}>
@@ -89,8 +91,13 @@ const styles = StyleSheet.create({
     color: "#0A3981",
   },
   loader: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadTxt: {
+    fontSize: 20,
+    textAlign: "center",
+    fontFamily: "Nunito-Bold",
   },
 });

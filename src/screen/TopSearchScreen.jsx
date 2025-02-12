@@ -1,18 +1,14 @@
 import React from "react";
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Text,
-} from "react-native";
-import Fontisto from "react-native-vector-icons/Fontisto";
-import Octicons from "react-native-vector-icons/Octicons";
+import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
+
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
-const TopSearchScreen = ({ isLoggedIn, phoneNumber }) => {
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+const TopSearchScreen = ({ isLoggedIn, phoneNumber, goToCart }) => {
   console.log(isLoggedIn);
   console.log(phoneNumber);
+
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
@@ -24,6 +20,12 @@ const TopSearchScreen = ({ isLoggedIn, phoneNumber }) => {
       <View style={styles.rightContainer}>
         <Ionicons name={"search"} size={25} style={styles.searchIcon} />
         <Ionicons name={"notifications"} size={25} style={styles.bellIcon} />
+        <MaterialCommunityIcons
+          name={"cart"}
+          size={25}
+          style={styles.cartIcon}
+          onPress={goToCart}
+        />
       </View>
       {/* <View style={styles.inputContainer}>
         <View style={styles.iconWrapper}>
@@ -109,6 +111,9 @@ const styles = StyleSheet.create({
   bellIcon: {
     color: "#0A3981",
     fontWeight: "bold",
+  },
+  cartIcon: {
+    color: "#0A3981",
   },
   rightContainer: {
     flexDirection: "row",

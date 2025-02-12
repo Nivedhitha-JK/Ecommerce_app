@@ -47,19 +47,7 @@ const OrderScreen = ({ route }) => {
           labels={labels}
         />
       </View>
-      <View style={styles.addressContainer}>
-        <View style={styles.address1}>
-          <Text style={styles.addressTxt}>Deliver to:</Text>
-          <TouchableOpacity style={styles.editBtn}>
-            <Text style={styles.editBtnTxt}>Change</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.address2}>
-          <Text style={styles.addressTxt}>Saravana</Text>
-          <Text>123,ABC Street</Text>
-          <Text>9087685467</Text>
-        </View>
-      </View>
+
 
       <View style={styles.productContainer}>
         <View style={styles.proImgContainer}>
@@ -77,6 +65,24 @@ const OrderScreen = ({ route }) => {
           <Text style={styles.proTxt1}>Qty: {selectedQuantity}</Text>
           <Text style={styles.proTxt1}>Color: {selectedColor}</Text>
           <Text style={styles.proTxt1}>Size: {selectedSize}</Text>
+        </View>
+      </View>
+      <View style={styles.addressContainer}>
+        <View style={styles.address1}>
+          <Text style={styles.addressTxt}>Deliver to:</Text>
+          <TouchableOpacity style={styles.editBtn}>
+            <Text
+              style={styles.editBtnTxt}
+              // onPress={() => navigation.navigate("Addr")}
+            >
+              Change
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.address2}>
+          <Text style={styles.addressTxt}>Saravana</Text>
+          <Text>123,ABC Street</Text>
+          <Text>9087685467</Text>
         </View>
       </View>
       {/* <View style={styles.msgContainer}>

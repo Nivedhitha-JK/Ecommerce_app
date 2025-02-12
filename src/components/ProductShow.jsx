@@ -9,7 +9,6 @@ import {
 } from "react-native";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 import API_BASE_URL from "../config/api";
@@ -17,13 +16,15 @@ import { useCart } from "../context/CartContext";
 import LoginModal from "../components/LoginModal";
 import { savePhoneNumber, getPhoneNumber } from "../utils/storageService";
 import Toast from "react-native-toast-message";
+import LoaderKit from "react-native-loader-kit";
+import { fetchProductDetails, phoneNoLogin } from "../utils/apiService";
 
 const ProductShow = () => {
   const { addToCart } = useCart();
 
   const route = useRoute();
-  const { productId } = route.params;
-  // console.log(productId);
+  const { productId, addedProduct, showToast } = route.params || {};
+  console.log(productId);
 
   const [productDetails, setProductDetails] = useState(null);
   const [availableColors, setAvailableColors] = useState(null);
@@ -56,19 +57,6 @@ const ProductShow = () => {
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false); // Flag to track if OTP is sent
   const [tempProduct, setTempProduct] = useState(null);
-  // const fetchColorByProduct = async (color) => {
-  //   setLoading(true);
-  //   try {
-  //     const response1 = await axios.post(
-  //       `${API_BASE_URL}/similarProductsByColor`
-  //     );
-  //   } catch (error) {
-  //     console.error("error while fetching data", error);
-  //     setError("Error in api");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const navigation = useNavigation();
 
@@ -86,6 +74,20 @@ const ProductShow = () => {
     checkLoginStatus();
   }, []);
 
+  useEffect(() => {
+    if (addedProduct) {
+      addToCart(addedProduct);
+      if (showToast) {
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "Item Added to Cart",
+          text2: `${addedProduct.name} has been added to your cart.`,
+        });
+      }
+    }
+  }, [addedProduct]);
+
   //monitor login state for navigation
 
   // useEffect(() => {
@@ -96,13 +98,36 @@ const ProductShow = () => {
 
   // submit login
   const loginSubmit = async () => {
-    if (phoneNumber.length === 10) {
+    if (phoneNumber.length === 9) {
       console.log(phoneNumber);
-      await savePhoneNumber(phoneNumber);
-      // setIsOtpSent(true);
-      setIsLoggedIn(true);
-      navigation.navigate("EnterOtpScreen", { phoneNumber, tempProduct });
-      setIsModalVisible(false);
+
+      try {
+        const response = await phoneNoLogin(phoneNumber);
+        console.log("Phone number response", response);
+        await savePhoneNumber(phoneNumber);
+        // setIsOtpSent(true);
+        setIsLoggedIn(true);
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "OTP sent successfully. Please check your phone.",
+        });
+        setTimeout(() => {
+          //no direct navigation availa for otpscreen,we have it inside homestack
+          navigation.navigate("Home", {
+            screen: "EnterOtpScreen",
+            params: { phoneNumber, tempProduct, productId },
+          });
+        }, 2000);
+        // navigation.navigate("EnterOtpScreen", {
+        //   phoneNumber,
+        //   tempProduct,
+        //   productId,
+        // });
+        setIsModalVisible(false);
+      } catch (error) {
+        Alert.alert(error.message, [{ text: "OK" }]);
+      }
     } else {
       Alert.alert(
         "Invalid Phone Number",
@@ -169,53 +194,68 @@ const ProductShow = () => {
   // call api to get product details data by passing id
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
+    const getProductDetails = async () => {
       setLoading(true);
-      console.log(productId);
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}getProductById?productId=${productId}`
-        );
-
-        console.log("Product Details", response.data.product);
-        console.log(response.data.product.images[0]);
-        setProductDetails(response.data.product);
-
-        const getColors = response.data.product.color;
-
-        // call api to fetch product colors
-
-        // const colorResponse = await axios.post(
-        //   `http://192.168.20.5:3000/similarProductsByColor`,
-        //   { productId }
-        // );
-
-        // const colors = colorResponse.data.colors.map((item) => item.colors);
-        // console.log(colors);
-
-        // console.log("color details", colorResponse.data.colors);
-
-        // setAvailableColors(colors);
+        const product = await fetchProductDetails(productId);
+        setProductDetails(product);
       } catch (error) {
-        console.error("error while fetching data", error);
-        setError("Error in api");
+        console.error("Error fetching product details");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProductDetails();
+    getProductDetails();
   }, [productId]);
+
+  // useEffect(() => {
+  //   const fetchProductDetails = async () => {
+  //     setLoading(true);
+  //     console.log(productId);
+  //     try {
+  //       const response = await axios.get(
+  //         `${API_BASE_URL}getProductById?productId=${productId}`
+  //       );
+
+  //       console.log("Product Details", response.data.product);
+  //       console.log(response.data.product.images[0]);
+  //       setProductDetails(response.data.product);
+
+  //       const getColors = response.data.product.color;
+
+  //       // call api to fetch product colors
+
+  //       // const colorResponse = await axios.post(
+  //       //   `http://192.168.20.5:3000/similarProductsByColor`,
+  //       //   { productId }
+  //       // );
+
+  //       // const colors = colorResponse.data.colors.map((item) => item.colors);
+  //       // console.log(colors);
+
+  //       // console.log("color details", colorResponse.data.colors);
+
+  //       // setAvailableColors(colors);
+  //     } catch (error) {
+  //       console.error("error while fetching data", error);
+  //       setError("Error in api");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchProductDetails();
+  // }, [productId]);
 
   if (loading) {
     return (
-      <View>
-        <Text>Loading...</Text>
-        {/* <LoaderKit
-          style={{ width: 50, height: 50 }}
-          name={"BallPulseSync"} // Optional: see list of animations below
-          color={"red"} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
-        /> */}
+      <View style={styles.loader}>
+        <LoaderKit
+          style={{ width: 150, height: 150 }}
+          name={"Pacman"}
+          color={"#0A3981"}
+        />
+        <Text style={styles.loadTxt}>Loading...</Text>
       </View>
     );
   }
@@ -237,8 +277,8 @@ const ProductShow = () => {
   }
 
   const sizes = productDetails.variants.map((variant) => variant.size);
-  console.log(sizes);
-  console.log(productDetails.images);
+  // console.log(sizes);
+  // console.log(productDetails.images);
 
   // go to order page
 
@@ -327,18 +367,21 @@ const ProductShow = () => {
             })}
           </View>
           <Text style={styles.sizeTxt}>Quantity:</Text>
-          <DropDownPicker
-            open={quantityOpen}
-            value={selectedQuantity}
-            items={selectedQuantityItem}
-            setOpen={setQuantityOpen}
-            setValue={setSelectedQuantity}
-            setItems={setSelectedQuantityItem}
-            dropDownDirection="TOP"
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            scrollViewProps={{ showsVerticalScrollIndicator: true }}
-          />
+          <View style={{ zIndex: 1000 }}>
+            <DropDownPicker
+              open={quantityOpen}
+              value={selectedQuantity}
+              items={selectedQuantityItem}
+              setOpen={setQuantityOpen}
+              setValue={setSelectedQuantity}
+              setItems={setSelectedQuantityItem}
+              dropDownDirection="TOP"
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+              scrollViewProps={{ showsVerticalScrollIndicator: true }}
+              listMode="SCROLLVIEW"
+            />
+          </View>
         </View>
         <View style={styles.btnContainer1}>
           <TouchableOpacity
@@ -498,6 +541,7 @@ const styles = StyleSheet.create({
   colorContainer: {
     flexDirection: "row",
     marginHorizontal: 20,
+    // backgroundColor: "red",
   },
   circleBorder: {
     width: 48,
@@ -506,6 +550,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 5,
+    // backgroundColor: "green",
   },
   dropdown: {
     margin: 10,
@@ -639,5 +684,17 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontSize: 15,
+  },
+  loader: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadTxt: {
+    // fontWeight: "bold",
+    fontSize: 20,
+    textAlign: "center",
+    fontFamily: "Nunito-Bold",
   },
 });

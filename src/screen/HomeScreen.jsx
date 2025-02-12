@@ -15,6 +15,8 @@ import {
   getPhoneNumber,
   removePhoneNumber,
 } from "../utils/storageService";
+import { fetchProducts } from "../utils/apiService";
+import PaymentScreen from "./PaymentScreen";
 
 const HomeScreen = () => {
   const width = Dimensions.get("window").width;
@@ -42,32 +44,46 @@ const HomeScreen = () => {
       };
 
       checkLoginStatus();
-
-      // return () => {};
     }, [isLoggedIn])
   );
 
   // fetch data from api
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true); // loading starts
-      try {
-        const response = await axios.post(`${API_BASE_URL}productList`);
-        console.log(response.data.products);
-        // const apiUrl = "http://192.168.20.5:3000/";
-        // const imgProductUrl = response.data.products[0].images[0];
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     setLoading(true); // loading starts
+  //     try {
+  //       const response = await axios.post(`${API_BASE_URL}productList`);
+  //       console.log(response.data.products);
+  //       // const apiUrl = "http://192.168.20.5:3000/";
+  //       // const imgProductUrl = response.data.products[0].images[0];
 
-        // const fullImgUrl = `${apiUrl}${imgProductUrl}`;
-        setProduct(response.data.products);
+  //       // const fullImgUrl = `${apiUrl}${imgProductUrl}`;
+  //       setProduct(response.data.products);
+  //     } catch (error) {
+  //       console.error("Error fetching data", error);
+  //     } finally {
+  //       setLoading(false); // loading ends
+  //     }
+  //   };
+  //   fetchProducts();
+  // }, []); // empty array ensures it run only once
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchProducts();
+        console.log(response);
+        setProduct(response);
       } catch (error) {
-        console.error("Error fetching data", error);
+        console.error("Error fetching products", error);
       } finally {
-        setLoading(false); // loading ends
+        setLoading(false);
       }
     };
-    fetchProducts();
-  }, []); // empty array ensures it run only once
+    loadProducts();
+  }, []);
 
   // data for carousel
 
@@ -177,6 +193,7 @@ const HomeScreen = () => {
           toggleModal={toggleModal}
           isLoggedIn={isLoggedIn}
           phoneNumber={phoneNumber}
+          goToCart={goToCart}
         />
         <LoginModal
           isVisible={isModalVisible}
@@ -193,27 +210,6 @@ const HomeScreen = () => {
         <SubCategoryScreen />
       </View>
 
-      {/* <Carousel
-        width={width}
-        height={300}
-        data={carouselData}
-        renderItem={({ item }) => (
-          <LinearGradient colors={["#D4EBF8", "#1F509A"]} style={styles.card}>
-            <Image source={item.image} style={styles.img1} />
-            <TouchableOpacity style={styles.cartContainer} onPress={goToCart}>
-              <MaterialCommunityIcons name={"cart"} size={23} />
-            </TouchableOpacity>
-
-            <View style={styles.txtContainer}>
-              <Text style={styles.bannerTxt}>{item.title}</Text>
-              <Text style={styles.subBannerTxt}>{item.subtitle}</Text>
-            </View>
-          </LinearGradient>
-        )}
-        autoPlay={true}
-        scrollAnimationDuration={1000}
-        loop={true}
-      /> */}
       <CarouselScreen carouselData={carouselData} goToCart={goToCart} />
 
       <ProductListing

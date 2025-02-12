@@ -16,6 +16,7 @@ const ProductCard = ({
   const [isLike, setIsLike] = useState(false);
   const handleLike = () => {
     setIsLike(!isLike);
+    console.log("Wishlisted Product ID is ", productId);
   };
 
   const navigation = useNavigation();
@@ -25,7 +26,7 @@ const ProductCard = ({
   // };
 
   console.log("product Id", productId);
-  console.log(fullImgUrl);
+  // console.log(fullImgUrl);
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPress}>
